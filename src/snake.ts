@@ -12,6 +12,7 @@ function rng(min: number, max: number) {
 }
 
 export default class Snake {
+  private static debug = true;
   private static offX = 2;
   private static offY = 2;
   private static width = 10;
@@ -40,6 +41,16 @@ export default class Snake {
 
     const hit = this.checkHit(this.x, this.y);
 
+    if (Snake.debug) {
+      cli.bg('black');
+      cli.fg('gray');
+      cli.move(Snake.width * 2 + 8, 2);
+      cli.write(`${this.x},${this.y}  `);
+      cli.move(Snake.width * 2 + 8, 3);
+      cli.write(`${this.foodX},${this.foodY}  `);
+      cli.move(Snake.width * 2 + 8, 4);
+      cli.write(hit);
+    }
 
     if (hit === 'wall' || hit === 'tail') {
       this.die();
