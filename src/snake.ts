@@ -3,7 +3,8 @@ import * as cli from './cli';
 type Direction = 'up' | 'down' | 'left' | 'right';
 type Hit = 'none' | 'wall' | 'tail' | 'food';
 
-const square = '\u25A0';
+const snake = '\u2588';
+const wall = '\u2591';
 
 export default class Snake {
   private static offX = 2;
@@ -82,27 +83,30 @@ export default class Snake {
   }
 
   private drawWall(x: number, y: number) {
-    cli.move(x + Snake.offX, y + Snake.offY);
+    cli.move(x*2 + Snake.offX, y + Snake.offY);
     cli.bg('gray');
     cli.fg('white');
-    cli.write(square);
+    cli.write(wall);
+    cli.write(wall);
   }
   private drawHead(x: number, y: number) {
-    cli.move(x + Snake.offX, y + Snake.offY);
+    cli.move(x*2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('white');
-    cli.write(square);
+    cli.write(snake);
+    cli.write(snake);
   }
   private drawTail(x: number, y: number) {
-    cli.move(x + Snake.offX, y + Snake.offY);
+    cli.move(x*2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('gray');
-    cli.write(square);
+    cli.write(snake);
+    cli.write(snake);
   }
   private drawEmpty(x: number, y: number) {
-    cli.move(x + Snake.offX, y + Snake.offY);
+    cli.move(x*2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('gray');
-    cli.write(' ');
+    cli.write('  ');
   }
 }
