@@ -1,10 +1,15 @@
 import * as cli from './cli';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
-type Hit = 'none' | 'wall' | 'tail' | 'food';
+type Hit = 'none' | 'wall' | 'tail' | 'food' | 'head';
 
 const snake = '\u2588';
 const wall = '\u2591';
+const food = '\u25c4\u25ba';
+
+function rng(min: number, max: number) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
 
 export default class Snake {
   private static offX = 2;
@@ -13,6 +18,8 @@ export default class Snake {
   private static height = 10;
   private x = 5;
   private y = 5;
+  private foodX = 0;
+  private foodY = 0;
   private direction: Direction = 'up';
   private alive = true;
   private interval: NodeJS.Timeout;
@@ -21,7 +28,8 @@ export default class Snake {
     cli.hideCursor();
     cli.clear();
     cli.input.on(this.onKey.bind(this));
-    this.interval = setInterval(this.loop.bind(this), 750);
+    this.interval = setInterval(this.loop.bind(this), 600);
+    this.createFood();
   }
 
   private loop() {
@@ -30,24 +38,35 @@ export default class Snake {
     else if (this.direction === 'left') --this.x;
     else if (this.direction === 'right') ++this.x;
 
-    const hit = this.checkHit();
+    const hit = this.checkHit(this.x, this.y);
+
 
     if (hit === 'wall' || hit === 'tail') {
       this.die();
       return;
     }
+    if (hit === 'food') {
+      this.createFood();
+    }
     this.draw();
   }
 
-  private checkHit(): Hit {
-    if (
-      this.x <= 0 ||
-      this.x > Snake.width ||
-      this.y <= 0 ||
-      this.y > Snake.height
-    ) {
+  private createFood() {
+    const food = [rng(1, 10), rng(1, 10)];
+    while (this.checkHit(food[0], food[1]) !== 'none') {
+      food[0] = rng(1, 10);
+      food[1] = rng(1, 10);
+    }
+    this.foodX = food[0];
+    this.foodY = food[1];
+  }
+
+  private checkHit(x: number, y: number): Hit {
+    if (x <= 0 || x > Snake.width || y <= 0 || y > Snake.height) {
       return 'wall';
     }
+    if (x === this.foodX && y === this.foodY) return 'food';
+    if (x === this.x && y === this.y) return 'head';
     return 'none';
   }
 
@@ -55,6 +74,7 @@ export default class Snake {
     clearInterval(this.interval);
     this.alive = false;
     cli.reset();
+    cli.move(1, Snake.height + Snake.offY + 1);
     process.exit(0);
   }
 
@@ -62,6 +82,7 @@ export default class Snake {
     for (let x = 1; x <= Snake.width; ++x) {
       for (let y = 1; y <= Snake.height; ++y) {
         if (x === this.x && y === this.y) this.drawHead(x, y);
+        else if (x === this.foodX && y === this.foodY) this.drawFood(x, y);
         else this.drawEmpty(x, y);
       }
     }
@@ -83,30 +104,36 @@ export default class Snake {
   }
 
   private drawWall(x: number, y: number) {
-    cli.move(x*2 + Snake.offX, y + Snake.offY);
+    cli.move(x * 2 + Snake.offX, y + Snake.offY);
     cli.bg('gray');
     cli.fg('white');
     cli.write(wall);
     cli.write(wall);
   }
   private drawHead(x: number, y: number) {
-    cli.move(x*2 + Snake.offX, y + Snake.offY);
+    cli.move(x * 2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('white');
     cli.write(snake);
     cli.write(snake);
   }
   private drawTail(x: number, y: number) {
-    cli.move(x*2 + Snake.offX, y + Snake.offY);
+    cli.move(x * 2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('gray');
     cli.write(snake);
     cli.write(snake);
   }
   private drawEmpty(x: number, y: number) {
-    cli.move(x*2 + Snake.offX, y + Snake.offY);
+    cli.move(x * 2 + Snake.offX, y + Snake.offY);
     cli.bg('black');
     cli.fg('gray');
     cli.write('  ');
+  }
+  private drawFood(x: number, y: number) {
+    cli.move(x * 2 + Snake.offX, y + Snake.offY);
+    cli.bg('black');
+    cli.fg('brightGreen');
+    cli.write(food);
   }
 }
