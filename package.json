@@ -1,0 +1,15 @@
+{
+  "name": "snake",
+  "version": "1.0.0",
+  "main": "./out/index.js",
+  "scripts": {"build": "tsc -b", "watch":"tsc -b -w"},
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
+    "eslint": "^8.10.0",
+    "prettier": "^2.5.1",
+    "ts-loader": "^9.2.7",
+    "typescript": "^4.6.2"
+  }
+}
