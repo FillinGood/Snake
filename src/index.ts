@@ -1,1 +1,3 @@
-console.log('vze');
+import Snake from "./snake";
+
+new Snake();

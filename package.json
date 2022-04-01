@@ -2,9 +2,13 @@
   "name": "snake",
   "version": "1.0.0",
   "main": "./out/index.js",
-  "scripts": {"build": "tsc -b", "watch":"tsc -b -w"},
+  "scripts": {
+    "build": "tsc -b",
+    "watch": "tsc -b -w"
+  },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "eslint": "^8.10.0",
