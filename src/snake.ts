@@ -24,6 +24,7 @@ export default class Snake {
   private direction: Direction = 'up';
   private alive = true;
   private interval: NodeJS.Timeout;
+  private tail: [number, number][] = [];
 
   constructor() {
     cli.hideCursor();
@@ -34,6 +35,8 @@ export default class Snake {
   }
 
   private loop() {
+    this.tail.unshift([this.x, this.y]);
+    this.tail.pop();
     if (this.direction === 'up') --this.y;
     else if (this.direction === 'down') ++this.y;
     else if (this.direction === 'left') --this.x;
@@ -50,6 +53,8 @@ export default class Snake {
       cli.write(`${this.foodX},${this.foodY}  `);
       cli.move(Snake.width * 2 + 8, 4);
       cli.write(hit);
+      cli.move(Snake.width * 2 + 8, 5);
+      cli.write(String(this.tail.length));
     }
 
     if (hit === 'wall' || hit === 'tail') {
@@ -57,6 +62,7 @@ export default class Snake {
       return;
     }
     if (hit === 'food') {
+      this.tail.unshift([this.x, this.y]);
       this.createFood();
     }
     this.draw();
@@ -76,6 +82,9 @@ export default class Snake {
     if (x <= 0 || x > Snake.width || y <= 0 || y > Snake.height) {
       return 'wall';
     }
+    for (const [tailx, taily] of this.tail) {
+      if (tailx === x && taily === y) return 'tail';
+    }
     if (x === this.foodX && y === this.foodY) return 'food';
     if (x === this.x && y === this.y) return 'head';
     return 'none';
@@ -94,6 +103,8 @@ export default class Snake {
       for (let y = 1; y <= Snake.height; ++y) {
         if (x === this.x && y === this.y) this.drawHead(x, y);
         else if (x === this.foodX && y === this.foodY) this.drawFood(x, y);
+        else if (this.tail.find(([tx, ty]) => tx === x && ty === y))
+          this.drawTail(x, y);
         else this.drawEmpty(x, y);
       }
     }
@@ -108,10 +119,11 @@ export default class Snake {
   }
 
   private onKey(key: cli.InputKey) {
-    if (key === 'left') this.direction = 'left';
-    else if (key === 'right') this.direction = 'right';
-    else if (key === 'up') this.direction = 'up';
-    else if (key === 'down') this.direction = 'down';
+    if (key === 'left' && this.direction !== 'right') this.direction = 'left';
+    else if (key === 'right' && this.direction !== 'left')
+      this.direction = 'right';
+    else if (key === 'up' && this.direction !== 'down') this.direction = 'up';
+    else if (key === 'down' && this.direction !== 'up') this.direction = 'down';
   }
 
   private drawWall(x: number, y: number) {
